@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "material-icons/iconfont/material-icons.css";
+
+* {
+    font-family: 'Open Sans', sans-serif;
+}
