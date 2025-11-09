@@ -5,10 +5,19 @@ require __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
+
 // Define Request Variable
 $uri = trim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
+if ($method == 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
 // Router
 if ($uri === 'register' && $method === 'POST') {
     $controller = new App\Controllers\AuthController();
