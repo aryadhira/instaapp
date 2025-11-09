@@ -10,12 +10,12 @@ $uri = trim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Router
-if ($uri === 'test' && $method === 'GET') {
-    header('Content-Type: application/json');
-    echo json_encode(['message' => 'API is running!', 'env' => $_ENV['APP_ENV']]);
-} elseif ($uri === 'getuser' && $method === 'GET') {
-    
-
+if ($uri === 'register' && $method === 'POST') {
+    $controller = new App\Controllers\AuthController();
+    $controller->register();
+} elseif ($uri === 'login' && $method === 'POST') {
+    $controller = new App\Controllers\AuthController();
+    $controller->login();
 } else {
     // Handle 404 Not Found
     http_response_code(404);
