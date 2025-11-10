@@ -6,7 +6,7 @@
         class="w-10 h-10 rounded-full object-cover mr-3" />
       <div class="flex-1">
         <div class="font-semibold text-gray-900">{{ post.username }}</div>
-        <div class="text-xs text-gray-500">2h ago</div>
+        <div class="text-xs text-gray-500">few minutes ago</div>
       </div>
     </div>
 
