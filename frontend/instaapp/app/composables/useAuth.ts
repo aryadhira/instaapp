@@ -56,15 +56,15 @@ export const useAuth = () => {
   }
 
   function logout() {
-    try {
-      $fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      }).catch(() => {});
-    } finally {
-      setToken(null);
-      user.value = null;
-    }
+    const jwt = useCookie(tokenCookieName)
+    const userId = useCookie("user_id")
+    const username = useCookie("username")
+
+    jwt.value = null
+    userId.value = null
+    username.value = null
+
+    navigateTo("/login")
   }
 
   function isAuthenticated() {

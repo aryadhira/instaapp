@@ -5,25 +5,29 @@
       <div class="flex justify-between h-16">
         <div class="flex items-center">
           <div class="shrink-0 flex items-center">
-            <span class="material-icons mr-2">camera</span>
+            <span class="material-icons mr-2 text-[#ff4d6d]">camera</span>
             <span class="text-2xl font-bold">InstaApp</span>
           </div>
         </div>
-        <div class="flex items-center">
+        <div class="flex items-center gap-3">
           <div class="shrink-0">
-            <button 
-              type="button"
-              :disabled="showModal"
+            <button type="button" :disabled="showModal"
               class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#ff4d6d] shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
               @click="showModal = true">
               <span class="material-icons mr-2 rotate-325">send</span>
               Create Post
             </button>
           </div>
+          <div class="flex gap-2 items-center">
+            <span class="material-icons rounded-full bg-[#ff4d6d] text-white">person</span>
+            <div class="">{{ username }}</div>
+            <span @click="logout"
+              class="material-icons rounded-full p-2 bg-[#ff4d6d] text-white cursor-pointer">logout</span>
+          </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Create Post Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -34,25 +38,21 @@
               <span class="material-icons">close</span>
             </button>
           </div>
-          
+
           <form @submit.prevent="submitPost">
             <div class="mb-4">
               <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-              <textarea
-                id="content"
-                v-model="content"
-                placeholder="What's on your mind?"
+              <textarea id="content" v-model="content" placeholder="What's on your mind?"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff4d6d] focus:border-[#ff4d6d]"
-                rows="3"
-                :disabled="loading"
-              ></textarea>
+                rows="3" :disabled="loading"></textarea>
               <p v-if="errors.content" class="mt-1 text-sm text-red-600">{{ errors.content }}</p>
             </div>
-            
+
             <div class="mb-4">
               <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Image</label>
               <div class="flex items-center justify-center w-full">
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <label
+                  class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">
                     <span class="material-icons text-gray-400">cloud_upload</span>
                     <p class="mb-2 text-sm text-gray-500">
@@ -60,39 +60,26 @@
                     </p>
                     <p class="text-xs text-gray-500">PNG, JPG, GIF (MAX. 5MB)</p>
                   </div>
-                  <input 
-                    id="image" 
-                    type="file" 
-                    class="hidden" 
-                    accept="image/*" 
-                    @change="handleImageUpload"
-                    :disabled="loading"
-                  >
+                  <input id="image" type="file" class="hidden" accept="image/*" @change="handleImageUpload"
+                    :disabled="loading">
                 </label>
               </div>
               <p v-if="errors.image" class="mt-1 text-sm text-red-600">{{ errors.image }}</p>
-              
+
               <!-- Image Preview -->
               <div v-if="imagePreview" class="mt-4">
                 <p class="text-sm font-medium text-gray-700 mb-2">Preview:</p>
                 <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain" />
               </div>
             </div>
-            
+
             <div class="flex justify-end space-x-3">
-              <button 
-                type="button" 
-                @click="closeModal" 
-                :disabled="loading"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff4d6d] disabled:opacity-50"
-              >
+              <button type="button" @click="closeModal" :disabled="loading"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff4d6d] disabled:opacity-50">
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                :disabled="loading"
-                class="px-4 py-2 text-sm font-medium text-white bg-[#ff4d6d] border border-transparent rounded-md shadow-sm hover:bg-[#e03a5c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff4d6d] disabled:opacity-50 flex items-center"
-              >
+              <button type="submit" :disabled="loading"
+                class="px-4 py-2 text-sm font-medium text-white bg-[#ff4d6d] border border-transparent rounded-md shadow-sm hover:bg-[#e03a5c] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ff4d6d] disabled:opacity-50 flex items-center">
                 <span v-if="loading" class="material-icons animate-spin mr-2">autorenew</span>
                 <span>{{ loading ? 'Posting...' : 'Post' }}</span>
               </button>
@@ -106,7 +93,7 @@
 
 <script setup>
 const { $apiFetch } = useNuxtApp()
-const mobileMenuOpen = ref(false)
+const auth = useAuth()
 const showModal = ref(false)
 const content = ref('')
 const imageFile = ref(null)
@@ -116,6 +103,8 @@ const errors = ref({
   content: '',
   image: ''
 })
+
+const username = useCookie("username")
 
 // Reactive variables for toast
 const showToast = ref(false)
@@ -220,6 +209,10 @@ const submitPost = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const logout = () => {
+  auth.logout()
 }
 
 // Close modal and reset form
