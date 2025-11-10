@@ -12,15 +12,14 @@
 
     <!-- Post Image -->
     <div class="w-full">
-      <img :src="config.public.baseUrl + post.image_url" :alt="`Post by ${post.username}`"
-        class="w-full object-cover max-h-96" />
+      <img :src="config.public.baseUrl + post.image_url" :alt="`Post by ${post.username}`" class="w-full max-h-96" />
     </div>
 
     <!-- Post Actions -->
     <div class="p-3">
       <div class="flex items-center space-x-4 mb-2">
         <button class="focus:outline-none" @click="toggleLike">
-          <span class="material-icons text-2xl" :class="{'text-red-500': isLiked, 'text-gray-700': !isLiked}">
+          <span class="material-icons text-2xl" :class="{ 'text-red-500': isLiked, 'text-gray-700': !isLiked }">
             {{ isLiked ? 'favorite' : 'favorite_border' }}
           </span>
         </button>
@@ -89,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+const { $apiFetch } = useNuxtApp()
 
 const props = defineProps({
   post: {
@@ -98,14 +97,35 @@ const props = defineProps({
   }
 })
 
+const username = useCookie("username")
+const userId = useCookie("user_id")
+
 const config = useRuntimeConfig()
 const openComments = ref(false)
 const newComment = ref('')
 const isLiked = ref(false)
 
 // Check if current user has liked the post
-const toggleLike = () => {
+const toggleLike = async() => {
   isLiked.value = !isLiked.value
+  if (isLiked.value){
+    props.post.likes.push({
+      user_id: userId.value,
+      username: username.value
+    })
+  }else{
+    const idx = props.post.likes.findIndex(obj => obj.user_id == props.post.user_id)
+    if (idx !== -1){
+      props.post.likes.splice(idx,1)
+    }
+  }
+  const param = {post_id:props.post.post_id}
+  await $apiFetch("/likes",{
+      method: 'POST',
+      body: param,
+    }
+  )
+
 }
 
 const closeComments = () => {
@@ -113,11 +133,23 @@ const closeComments = () => {
   newComment.value = ''
 }
 
-const addComment = () => {
+const addComment = async() => {
   if (newComment.value.trim()) {
-    // In a real app, you would send this to the backend
-    console.log('Adding comment:', newComment.value)
+    props.post.comments.unshift({
+      username: username.value,
+      content: newComment.value
+    })
+    const param = {post_id:props.post.post_id,content:newComment.value}
+    await $apiFetch("/comments",{
+        method: 'POST',
+        body: param,
+      }
+    )
     newComment.value = ''
   }
 }
+
+onMounted(()=>{
+  isLiked.value = props.post.likes.findIndex(obj => obj.user_id == userId.value) !== -1
+})
 </script>

@@ -1,5 +1,3 @@
-import { ref } from "vue";
-
 const tokenCookieName = "jwt_token"; 
 
 export const useAuth = () => {
@@ -43,6 +41,10 @@ export const useAuth = () => {
       // If backend returns token in JSON as fallback:
       if ((res as any).status == "success") {
         setToken((res as any).token, false);
+        const cookie = useCookie("username");
+        cookie.value = (res as any).username;
+        const cookie_userid = useCookie("user_id");
+        cookie_userid.value = (res as any).user_id;
       } else {
         loadToken();
       }
