@@ -67,6 +67,7 @@ class AuthController
             echo json_encode([
                 'status' => 'success',
                 'user_id' => $result['user_id'],
+                'username' => $result['username'],
                 'token' => $result['token']
             ]);
         } else {

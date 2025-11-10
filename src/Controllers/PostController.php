@@ -88,6 +88,7 @@ class PostController
     {
         $imagePath = $_ENV['IMAGE_PATH'] ?? 'uploads';
         $imageDir = __DIR__ . '/../../' . $imagePath;
+        $imageUrl = $_ENV['IMAGE_URL'];
 
         // Create directory if it doesn't exist
         if (!is_dir($imageDir)) {
@@ -116,7 +117,7 @@ class PostController
 
         // Move the uploaded file to the destination
         if (move_uploaded_file($file['tmp_name'], $fullImagePath)) {
-            return $imagePath . '/' . $newFilename;
+            return $imageUrl . '/' . $newFilename;
         } else {
             error_log("Failed to move uploaded file to: {$fullImagePath}");
             return null;

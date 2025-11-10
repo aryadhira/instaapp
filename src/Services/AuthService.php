@@ -79,7 +79,7 @@ class AuthService
     public function loginUser(string $identifier, string $password): array
     {
         $stmt = $this->pdo->prepare("
-            SELECT id, password_hash FROM users 
+            SELECT id, password_hash, username FROM users 
             WHERE email = :identifier OR username = :identifier
         ");
         $stmt->execute(['identifier' => $identifier]);
@@ -95,6 +95,6 @@ class AuthService
 
         $token = $this->generateJwt($user['id']);
 
-        return ['success' => true, 'user_id' => $user['id'], 'token' => $token];
+        return ['success' => true, 'user_id' => $user['id'], 'username' => $user['username'] ,'token' => $token];
     }
 }
