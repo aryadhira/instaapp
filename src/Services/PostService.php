@@ -82,6 +82,7 @@ class PostService
                 // Get comments for this post with usernames, ordered by newest first
                 $commentsSql = "
                     SELECT
+                        c.id,
                         c.user_id,
                         u.username,
                         c.content

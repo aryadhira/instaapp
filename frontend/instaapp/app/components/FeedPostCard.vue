@@ -60,7 +60,7 @@
 
         <!-- Comments List -->
         <div class="flex-1 overflow-y-auto p-4 space-y-3">
-          <div v-for="(comment, index) in post.comments" :key="index" class="flex items-start">
+          <div v-for="(comment, index) in post.comments" :key="index" class="flex gap-2 items-start">
             <img :src="`https://avatar.iran.liara.run/public/10`" alt="User Avatar"
               class="w-8 h-8 rounded-full object-cover mr-2" />
             <div class="flex-1">
@@ -69,6 +69,8 @@
                 <div class="text-sm">{{ comment.content }}</div>
               </div>
             </div>
+            <span @click="deleteComment(comment.id)" v-if="comment.username == username"
+              class="material-icons text-red-500 cursor-pointer">delete</span>
           </div>
         </div>
 
@@ -106,24 +108,24 @@ const newComment = ref('')
 const isLiked = ref(false)
 
 // Check if current user has liked the post
-const toggleLike = async() => {
+const toggleLike = async () => {
   isLiked.value = !isLiked.value
-  if (isLiked.value){
+  if (isLiked.value) {
     props.post.likes.push({
       user_id: userId.value,
       username: username.value
     })
-  }else{
+  } else {
     const idx = props.post.likes.findIndex(obj => obj.user_id == props.post.user_id)
-    if (idx !== -1){
-      props.post.likes.splice(idx,1)
+    if (idx !== -1) {
+      props.post.likes.splice(idx, 1)
     }
   }
-  const param = {post_id:props.post.post_id}
-  await $apiFetch("/likes",{
-      method: 'POST',
-      body: param,
-    }
+  const param = { post_id: props.post.post_id }
+  await $apiFetch("/likes", {
+    method: 'POST',
+    body: param,
+  }
   )
 
 }
@@ -133,23 +135,36 @@ const closeComments = () => {
   newComment.value = ''
 }
 
-const addComment = async() => {
+const addComment = async () => {
   if (newComment.value.trim()) {
     props.post.comments.unshift({
       username: username.value,
       content: newComment.value
     })
-    const param = {post_id:props.post.post_id,content:newComment.value}
-    await $apiFetch("/comments",{
-        method: 'POST',
-        body: param,
-      }
+    const param = { post_id: props.post.post_id, content: newComment.value }
+    await $apiFetch("/comments", {
+      method: 'POST',
+      body: param,
+    }
     )
     newComment.value = ''
   }
 }
 
-onMounted(()=>{
+const deleteComment = async (commentId) => {
+  const param = { comment_id: commentId }
+  await $apiFetch("/comments", {
+    method: 'DELETE',
+    body: param,
+  }
+  )
+  const idx = props.post.comments.findIndex(obj => obj.id == commentId)
+  if (idx !== -1) {
+    props.post.comments.splice(idx, 1)
+  }
+}
+
+onMounted(() => {
   isLiked.value = props.post.likes.findIndex(obj => obj.user_id == userId.value) !== -1
 })
 </script>

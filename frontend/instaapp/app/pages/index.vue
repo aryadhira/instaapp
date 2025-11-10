@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ResponsiveNavbar />
+    <ResponsiveNavbar @post-created="loadFeed" />
     <div class="container mx-auto py-8">
       <div v-for="(post, index) in postData" :key="index">
         <FeedPostCard :post="post" />
@@ -13,13 +13,15 @@
 const { $apiFetch } = useNuxtApp()
 const postData = ref([])
 
-onMounted(async () => {
+const loadFeed = async() => {
   const res = await $apiFetch('/posts', { "method": "GET" })
-  console.log(res)
   if (res.status == "success") {
-    console.log("test")
     postData.value = res.posts
   }
+}
+
+onMounted(async () => {
+  await loadFeed()
 })
 
 </script>

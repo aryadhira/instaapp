@@ -92,6 +92,9 @@
 </template>
 
 <script setup>
+// Define emits
+const emit = defineEmits(['post-created'])
+
 const { $apiFetch } = useNuxtApp()
 const auth = useAuth()
 const showModal = ref(false)
@@ -201,6 +204,8 @@ const submitPost = async () => {
     
     // Show success toast
     showToastMessage('success', 'Post created successfully!')
+
+    emit("post-created")
     
   } catch (error) {
     // Show error message
